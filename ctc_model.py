@@ -102,7 +102,7 @@ def ctc_crnn(params):
         params['vocabulary_size'] + 1,  # BLANK
         activation_fn=None,
     )
-    
+
     tf.add_to_collection("logits",logits) # for restoring purposes
 
     # CTC Loss computation

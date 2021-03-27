@@ -35,14 +35,14 @@ PrIMuS can be donwloaded from https://grfia.dlsi.ua.es/primus/
 Assuming that PrIMuS dataset has been downloaded, and all its samples has been placed in the same folder, the training of the models can be done with `ctc_training.py`. It is necessary to build a list of training samples and the set of symbols (vocabulary). Examples of these files are given in `Data`folder.
 
 
-### Semantic  
+### Semantic
 
 ```
 python ctc_training.py -semantic -corpus <path_to_PrIMuS> -set Data/train.txt -vocabulary Data/vocabulary_semantic.txt  -save_model ./trained_semantic_model
 ```
 
 
-### Agnostic  
+### Agnostic
 
 ```
 python ctc_training.py -corpus <path_to_PrIMuS> -set Data/train.txt -vocabulary Data/vocabulary_agnostic.txt -save_model ./trained_agnostic_model
@@ -112,8 +112,46 @@ clef.C-L1	accidental.flat-L4	accidental.flat-L2	accidental.flat-S3	digit.2-L4	di
 
 As discussed in the paper, this representation often misses the last barline.
 
+## Dependencies
 
-## Contact: 
+Here is a reproducible way of getting all needed dependencies on Linux:
+
+```
+# Install Python3.7. Higher versions do not work with tensorflow 1.15.x. Here, I install it from
+# source and use venv to prevent collisions with other python versions.
+mkdir python3_7_root
+cd python3_7_root/
+sudo apt update
+sudo apt upgrade
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget
+# needed for opencv later
+sudo apt install ffmpeg libsm6 libxext6 -y
+curl -O https://www.python.org/ftp/python/3.7.10/Python-3.7.10.tar.xz
+tar -xf Python-3.7.10.tar.xz
+cd Python-3.7.10
+./configure --enable-optimizations
+make -j 8 # integer is the number of CPU cores, this will take on the order of 20 minutes
+sudo make altinstall
+cd .. # get back to `python3_7_root` directory
+python3.7 -m venv venv
+
+# now open a new command prompt (the one used for setup does not have its PATH refreshed)
+# and run this for every new command prompt opened that you want to use python3.7 with:
+source venv/bin/activate
+# this should prefix `(venv)` to the prompt and allow plain `pip` and `python` commands to be used
+
+pip install tensorflow>=1.15.5 # this is the last version of tensorflow that currently works
+pip install opencv-python>=4.5.1.48  # as of writing, this latest version works
+
+git clone https://github.com/OMR-Research/tf-end-to-end
+# get a model like the semantic model from https://grfia.dlsi.ua.es/primus/models/PrIMuS/Semantic-Model.zip
+# create a ``tf-end-to-end/Models/` directory and extract the zip contents into it
+
+# this should now work
+python ctc_predict.py -image Data/Example/000051652-1_2_1.png -model Models/semantic_model.meta -vocabulary Data/vocabulary_semantic.txt
+```
+
+## Contact:
 
 * Jorge Calvo Zaragoza (jcalvo@dlsi.ua.es)
 
